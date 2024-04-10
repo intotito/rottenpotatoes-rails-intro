@@ -7,8 +7,18 @@ class MoviesController < ApplicationController
   end
 
   def index
-    order = params['sort_by']
-    @movies = Movie.order(order)
+    @order_by = params['sort_by'] || session[:sort_by]
+    @all_ratings = Movie.select(:rating).distinct().pluck(:rating)
+    @ratings_to_show = params[:ratings] || (params[:commit] == 'Refresh' ? {} : session[:ratings_list]) 
+    puts 'Awumen Alora ' + params[:ratings].to_s
+    @movies = Movie.where(rating: @ratings_to_show.keys).order(@order_by)
+
+    #@rating_list = params[:ratings]&.keys
+    #@ratings_to_show = @rating_list || ''
+    #@movies = Movie.with_ratings(@)
+    #debugger
+    session[:sort_by] = @order_by
+    session[:ratings_list] = @ratings_to_show
   end
 
   def new
@@ -45,4 +55,5 @@ class MoviesController < ApplicationController
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
+
 end

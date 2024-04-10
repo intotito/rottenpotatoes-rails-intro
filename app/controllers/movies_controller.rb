@@ -7,13 +7,16 @@ class MoviesController < ApplicationController
   end
 
   def index
+    # initialize ordering with either of params or session and revert to default 'id' if all fails
     @order_by = params['sort_by'] || session[:sort_by] || 'id'
+    # Query database and extract all unique ratings
     @all_ratings = Movie.select(:rating).distinct().pluck(:rating)
+    # populate ratings to show from params or session and revert to all ratings if all fails
     @ratings_to_show = params[:ratings]&.keys || 
                       (params[:commit] == 'Refresh' ? @all_ratings : 
                       (!session[:ratings_list] || session[:ratings_list].empty?) ? @all_ratings : 
                       session[:ratings_list])
-
+    # Order movies according to ordering
     @movies = Movie.where(rating: @ratings_to_show).order(@order_by)
 
     session[:sort_by] = @order_by

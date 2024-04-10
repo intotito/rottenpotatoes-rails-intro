@@ -7,17 +7,23 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @order_by = params['sort_by'] || session[:sort_by]
+    @order_by = params['sort_by'] || session[:sort_by] || 'id'
     @all_ratings = Movie.select(:rating).distinct().pluck(:rating)
-    @ratings_to_show = params[:ratings] || (params[:commit] == 'Refresh' ? {} : session[:ratings_list]) 
-    puts 'Awumen Alora ' + params[:ratings].to_s
-    @movies = Movie.where(rating: @ratings_to_show.keys).order(@order_by)
+    @ratings_to_show = params[:ratings]&.keys || 
+                      (params[:commit] == 'Refresh' ? @all_ratings : 
+                      (!session[:ratings_list] || session[:ratings_list].empty?) ? @all_ratings : 
+                      session[:ratings_list])
 
-    #@rating_list = params[:ratings]&.keys
-    #@ratings_to_show = @rating_list || ''
-    #@movies = Movie.with_ratings(@)
-    #debugger
+    @movies = Movie.where(rating: @ratings_to_show).order(@order_by)
+
     session[:sort_by] = @order_by
+    if params[:ratings]
+    
+    elsif params[:commit] == 'Refresh'
+      @ratings_to_show = []
+    elsif session[:ratings_list] && session[:ratings_list].empty?
+      @ratings_to_show = []
+    end
     session[:ratings_list] = @ratings_to_show
   end
 

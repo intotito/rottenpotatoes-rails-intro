@@ -23,11 +23,12 @@
 <table class="table table-striped col-md-12" id="movies">
   <thead>
     <tr>
-      <th  <%= @order_by == 'title' ? 'class=bg-warning' : '' %> >
+      <th  <%= @order_by == 'title' ? "class=hilite" : '' %> >
           <%= link_to(
                     'Movie Title', movies_path({:sort_by => 'title'}), 
                     :id => 'title_header',
                     :class => ('hilite bg-warning' if @order_by == 'title')
+                    
           )%>
         </th>
       <th>Rating</th>

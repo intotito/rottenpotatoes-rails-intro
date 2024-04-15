@@ -65,4 +65,11 @@ class MoviesController < ApplicationController
     params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
 
+  private
+  def get_class param
+    mm = @order_by == param ? Array['bg-warning'] : ''
+    mm
+  end
+
+  helper_method :get_class
 end
